@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Completa las Bienaventuranzas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#3B2E2A;
+    --paper:#FFF8EC;
+    --coral:#FF6F59;
+    --gold:#FFC93C;
+    --leaf:#4CAF7D;
+    --wrong:#E8563E;
+    --c1:#FADADD; --c1d:#E39BA3;
+    --c2:#CDEAF7; --c2d:#7EB8D6;
+    --c3:#D9EFC8; --c3d:#8FC26B;
+    --c4:#E6D9F5; --c4d:#B592D9;
+    --c5:#FFF3C4; --c5d:#E6C558;
+    --c6:#CFE8E3; --c6d:#6FB6AA;
+    --c7:#FFE0C2; --c7d:#E6A05C;
+    --c8:#D6E4F0; --c8d:#8EAFCB;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% 8%, #FFEFC7 0%, transparent 40%),
+      radial-gradient(circle at 90% 4%, #DFF3E8 0%, transparent 35%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Quicksand',sans-serif;
+    line-height:1.5;
+    padding-bottom:3rem;
+  }
+  h1,h2,.numeral,.tile,.blank{font-family:'Baloo 2',sans-serif;}
+
+  /* HERO */
+  .hero{
+    text-align:center;
+    padding:2.4rem 1.4rem 1.6rem;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .decor{
+    font-size:1.8rem;
+    display:flex;
+    justify-content:center;
+    gap:1.1rem;
+    margin-bottom:.4rem;
+    animation:float 3.5s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+  }
+  .badge{
+    display:inline-block;
+    background:var(--coral);
+    color:#fff;
+    font-weight:700;
+    font-size:.8rem;
+    letter-spacing:.03em;
+    padding:.35rem .9rem;
+    border-radius:999px;
+    margin-bottom:.7rem;
+    transform:rotate(-2deg);
+  }
+  h1{
+    font-size:clamp(1.7rem,7vw,2.5rem);
+    font-weight:800;
+    margin:0 0 .5rem;
+    color:var(--ink);
+  }
+  h1 span{color:var(--coral);}
+  .hero p{
+    max-width:38ch;
+    margin:0 auto;
+    font-weight:600;
+    color:#6B5B4F;
+    font-size:1.02rem;
+  }
+
+  /* PROGRESS */
+  .progress-wrap{
+    max-width:520px;
+    margin:1.2rem auto 0;
+    padding:0 1.4rem;
+  }
+  .progress-track{
+    background:#EFE4D2;
+    border-radius:999px;
+    height:14px;
+    overflow:hidden;
+    border:2px solid #E4D5BC;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--gold),var(--coral));
+    border-radius:999px;
+    transition:width .4s ease;
+  }
+  .progress-label{
+    text-align:center;
+    font-weight:700;
+    font-size:.85rem;
+    margin-top:.4rem;
+    color:#8A7A64;
+  }
+
+  /* WORD BANK */
+  .bank-wrap{
+    max-width:640px;
+    margin:1.4rem auto 0;
+    padding:0 1.4rem;
+  }
+  .bank{
+    background:#fff;
+    border:2.5px dashed #E4D5BC;
+    border-radius:18px;
+    padding:1rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.6rem;
+    justify-content:center;
+    min-height:64px;
+  }
+  .tile{
+    background:var(--gold);
+    color:var(--ink);
+    border:none;
+    border-radius:12px;
+    padding:.55rem 1rem;
+    font-size:1.02rem;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 3px 0 #D9A81F;
+    transition:transform .12s ease, box-shadow .12s ease, opacity .2s ease;
+  }
+  .tile:hover{transform:translateY(-2px);}
+  .tile:active{transform:translateY(1px);box-shadow:0 1px 0 #D9A81F;}
+  .tile.selected{
+    background:var(--coral);
+    color:#fff;
+    box-shadow:0 3px 0 #C74A38;
+    animation:pulse 1s ease-in-out infinite;
+  }
+  .tile.used{
+    visibility:hidden;
+    pointer-events:none;
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1) translateY(-2px);}
+    50%{transform:scale(1.07) translateY(-2px);}
+  }
+  .bank-empty-msg{
+    font-weight:700;
+    color:var(--leaf);
+    font-size:.95rem;
+    padding:.4rem;
+  }
+
+  /* VERSES */
+  .verses{
+    max-width:640px;
+    margin:1.6rem auto 0;
+    padding:0 1.4rem;
+    display:flex;
+    flex-direction:column;
+    gap:.85rem;
+  }
+  .verse-card{
+    display:flex;
+    align-items:center;
+    gap:.9rem;
+    background:var(--rowbg);
+    border:2px solid var(--rowborder);
+    border-radius:16px;
+    padding:.9rem 1rem;
+  }
+  .num-circle{
+    flex:none;
+    width:38px;height:38px;
+    border-radius:50%;
+    background:#fff;
+    border:2px solid var(--rowborder);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;
+    font-size:1.05rem;
+  }
+  .verse-icon{
+    flex:none;
+    font-size:1.6rem;
+    width:34px;
+    text-align:center;
+  }
+  .verse-text{
+    font-size:1rem;
+    font-weight:600;
+    flex:1;
+  }
+  .blank{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:96px;
+    padding:.15rem .5rem;
+    margin:0 .15rem;
+    border-radius:8px;
+    background:#fff;
+    border:2px dashed var(--rowborder);
+    font-weight:700;
+    color:var(--rowborder);
+    cursor:pointer;
+    transition:transform .12s ease, background .2s ease, border-color .2s ease;
+    vertical-align:middle;
+  }
+  .blank:hover{transform:translateY(-1px);}
+  .blank.filled{
+    border-style:solid;
+    color:var(--ink);
+    background:#fff;
+  }
+  .blank.correct{
+    background:#E4F5EA;
+    border-color:var(--leaf);
+    color:#2E7D53;
+  }
+  .blank.wrong{
+    background:#FCE4E0;
+    border-color:var(--wrong);
+    color:var(--wrong);
+    animation:shake .35s ease;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-4px);}
+    75%{transform:translateX(4px);}
+  }
+  .check-icon{margin-left:.25rem;font-size:.85rem;}
+
+  /* ROW COLORS */
+  .row1{--rowbg:var(--c1);--rowborder:var(--c1d);}
+  .row2{--rowbg:var(--c2);--rowborder:var(--c2d);}
+  .row3{--rowbg:var(--c3);--rowborder:var(--c3d);}
+  .row4{--rowbg:var(--c4);--rowborder:var(--c4d);}
+  .row5{--rowbg:var(--c5);--rowborder:var(--c5d);}
+  .row6{--rowbg:var(--c6);--rowborder:var(--c6d);}
+  .row7{--rowbg:var(--c7);--rowborder:var(--c7d);}
+  .row8{--rowbg:var(--c8);--rowborder:var(--c8d);}
+
+  /* ACTIONS */
+  .actions{
+    max-width:640px;
+    margin:1.8rem auto 0;
+    padding:0 1.4rem;
+    display:flex;
+    gap:.8rem;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    border:none;
+    border-radius:14px;
+    padding:.8rem 1.5rem;
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:1.05rem;
+    cursor:pointer;
+    transition:transform .12s ease;
+  }
+  .btn:active{transform:translateY(2px);}
+  .btn-check{
+    background:var(--leaf);
+    color:#fff;
+    box-shadow:0 4px 0 #37835C;
+  }
+  .btn-reset{
+    background:#fff;
+    color:var(--ink);
+    border:2px solid #E4D5BC;
+    box-shadow:0 4px 0 #E4D5BC;
+  }
+
+  .msg-banner{
+    max-width:640px;
+    margin:1rem auto 0;
+    padding:0 1.4rem;
+    text-align:center;
+    font-weight:700;
+    min-height:1.4rem;
+  }
+  .msg-banner.win{color:var(--leaf);font-size:1.15rem;}
+  .msg-banner.hint{color:#B08A3E;}
+
+  .win-card{
+    max-width:520px;
+    margin:1.2rem auto 0;
+    padding:1.4rem;
+    background:linear-gradient(135deg,#FFF3C4,#FFE0C2);
+    border:3px solid var(--gold);
+    border-radius:20px;
+    text-align:center;
+    display:none;
+  }
+  .win-card.show{display:block;}
+  .win-card .trophy{font-size:2.4rem;}
+  .win-card h2{margin:.2rem 0 .3rem;font-size:1.4rem;}
+  .win-card p{margin:0;font-weight:600;color:#6B5B4F;}
+
+  .confetti{
+    position:fixed;
+    top:-20px;
+    width:10px;height:10px;
+    border-radius:2px;
+    z-index:999;
+    pointer-events:none;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+
+  @media (max-width:420px){
+    .verse-card{flex-wrap:wrap;}
+    .blank{min-width:84px;}
+  }
+</style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="decor">🌳 👑 🕊️ 🌾 ⚖️</div>
+  <span class="badge">ACTIVIDAD</span>
+  <h1>Aprendiendo las 8 <span>Bienaventuranzas</span></h1>
+  <p>Toca una palabra del banco y luego toca el espacio en blanco donde crees que va.</p>
+</section>
+
+<div class="progress-wrap">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">0 de 8 espacios completados</div>
+</div>
+
+<div class="bank-wrap">
+  <div class="bank" id="bank"></div>
+</div>
+
+<div class="verses" id="verses"></div>
+
+<div class="actions">
+  <button class="btn btn-check" id="checkBtn">✅ Verificar</button>
+  <button class="btn btn-reset" id="resetBtn">🔄 Reiniciar</button>
+</div>
+
+<div class="msg-banner" id="msgBanner"></div>
+
+<div class="win-card" id="winCard">
+  <div class="trophy">🏆</div>
+  <h2>¡Las completaste todas!</h2>
+  <p>Ya te sabes las 8 Bienaventuranzas de memoria.</p>
+</div>
+
+<script>
+const lines = [
+  {pre:"Bienaventurados los pobres de espíritu, porque de ellos es el", post:"de los cielos.", icon:"👑", answer:"REINO", row:1},
+  {pre:"Bienaventurados los que lloran, porque ellos serán", post:".", icon:"🕊️", answer:"consolados", row:2},
+  {pre:"Bienaventurados los", post:", porque ellos heredarán la tierra.", icon:"🌾", answer:"mansos", row:3},
+  {pre:"Bienaventurados los que tienen hambre y sed de", post:", porque ellos serán saciados.", icon:"⚖️", answer:"justicia", row:4},
+  {pre:"Bienaventurados los misericordiosos, porque ellos alcanzarán", post:".", icon:"🙏", answer:"misericordia", row:5},
+  {pre:"Bienaventurados los limpios de", post:", porque ellos verán a Dios.", icon:"❤️", answer:"corazón", row:6},
+  {pre:"Bienaventurados los que trabajan por la", post:", porque serán llamados hijos de Dios.", icon:"🌍", answer:"paz", row:7},
+  {pre:"Bienaventurados los perseguidos por la", post:", porque de ellos es el Reino de los cielos.", icon:"🐦", answer:"justicia", row:8}
+];
+
+const bankWords = ["misericordia","justicia","REINO","paz","mansos","corazón","consolados","justicia"];
+
+const bankEl = document.getElementById('bank');
+const versesEl = document.getElementById('verses');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+const msgBanner = document.getElementById('msgBanner');
+const winCard = document.getElementById('winCard');
+
+let tiles = [];
+let selectedTileId = null;
+
+function buildBank(){
+  bankEl.innerHTML = '';
+  tiles = bankWords.map((w,i)=>({id:'t'+i, word:w, used:false}));
+  tiles.forEach(t=>{
+    const btn = document.createElement('button');
+    btn.className = 'tile';
+    btn.textContent = t.word;
+    btn.dataset.id = t.id;
+    btn.addEventListener('click', ()=>onTileClick(t.id));
+    bankEl.appendChild(btn);
+  });
+}
+
+function buildVerses(){
+  versesEl.innerHTML = '';
+  lines.forEach((line,i)=>{
+    const card = document.createElement('div');
+    card.className = `verse-card row${line.row}`;
+    card.innerHTML = `
+      <div class="num-circle">${i+1}</div>
+      <div class="verse-icon">${line.icon}</div>
+      <div class="verse-text">
+        ${line.pre}
+        <span class="blank" data-index="${i}" tabindex="0" role="button"></span>
+        ${line.post}
+      </div>
+    `;
+    versesEl.appendChild(card);
+  });
+  document.querySelectorAll('.blank').forEach(b=>{
+    b.addEventListener('click', ()=>onBlankClick(parseInt(b.dataset.index)));
+    b.addEventListener('keydown', e=>{
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); onBlankClick(parseInt(b.dataset.index)); }
+    });
+  });
+}
+
+function onTileClick(id){
+  const tile = tiles.find(t=>t.id===id);
+  if(!tile || tile.used) return;
+  if(selectedTileId === id){
+    selectedTileId = null;
+  } else {
+    selectedTileId = id;
+  }
+  renderBank();
+}
+
+function renderBank(){
+  document.querySelectorAll('.tile').forEach(btn=>{
+    const t = tiles.find(x=>x.id===btn.dataset.id);
+    btn.classList.toggle('used', t.used);
+    btn.classList.toggle('selected', t.id===selectedTileId);
+  });
+  const allUsed = tiles.every(t=>t.used);
+  let emptyMsg = bankEl.querySelector('.bank-empty-msg');
+  if(allUsed && !emptyMsg){
+    emptyMsg = document.createElement('div');
+    emptyMsg.className = 'bank-empty-msg';
+    emptyMsg.textContent = '¡Usaste todas las palabras! Toca "Verificar".';
+    bankEl.appendChild(emptyMsg);
+  } else if(!allUsed && emptyMsg){
+    emptyMsg.remove();
+  }
+}
+
+function onBlankClick(index){
+  const blankEl = document.querySelector(`.blank[data-index="${index}"]`);
+  const currentTileId = blankEl.dataset.tileId;
+
+  if(currentTileId){
+    const t = tiles.find(x=>x.id===currentTileId);
+    if(t) t.used = false;
+    blankEl.textContent = '';
+    blankEl.removeAttribute('data-tile-id');
+    blankEl.classList.remove('filled','correct','wrong');
+    renderBank();
+    updateProgress();
+    return;
+  }
+
+  if(selectedTileId){
+    const t = tiles.find(x=>x.id===selectedTileId);
+    t.used = true;
+    blankEl.textContent = t.word;
+    blankEl.dataset.tileId = t.id;
+    blankEl.classList.add('filled');
+    blankEl.classList.remove('correct','wrong');
+    selectedTileId = null;
+    renderBank();
+    updateProgress();
+  }
+}
+
+function updateProgress(){
+  const filled = document.querySelectorAll('.blank.filled').length;
+  progressFill.style.width = (filled/lines.length*100) + '%';
+  progressLabel.textContent = `${filled} de ${lines.length} espacios completados`;
+  msgBanner.textContent = '';
+  winCard.classList.remove('show');
+}
+
+document.getElementById('checkBtn').addEventListener('click', ()=>{
+  let allFilled = true;
+  let allCorrect = true;
+  lines.forEach((line,i)=>{
+    const blankEl = document.querySelector(`.blank[data-index="${i}"]`);
+    if(!blankEl.classList.contains('filled')){
+      allFilled = false;
+      return;
+    }
+    const value = blankEl.textContent.trim().toLowerCase();
+    const isCorrect = value === line.answer.toLowerCase();
+    blankEl.classList.remove('correct','wrong');
+    if(isCorrect){
+      blankEl.classList.add('correct');
+    } else {
+      blankEl.classList.add('wrong');
+      allCorrect = false;
+    }
+  });
+
+  if(!allFilled){
+    msgBanner.className = 'msg-banner hint';
+    msgBanner.textContent = 'Todavía te faltan espacios por completar.';
+    return;
+  }
+
+  if(allCorrect){
+    msgBanner.className = 'msg-banner win';
+    msgBanner.textContent = '¡Excelente! Todo correcto 🎉';
+    winCard.classList.add('show');
+    launchConfetti();
+  } else {
+    msgBanner.className = 'msg-banner hint';
+    msgBanner.textContent = 'Casi... revisa los espacios en rojo y vuelve a intentar.';
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  selectedTileId = null;
+  buildBank();
+  buildVerses();
+  updateProgress();
+  msgBanner.textContent = '';
+  winCard.classList.remove('show');
+});
+
+function launchConfetti(){
+  const colors = ['#FF6F59','#FFC93C','#4CAF7D','#7EB8D6','#B592D9'];
+  for(let i=0;i<60;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = Math.random()*100 + 'vw';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.opacity = 0.9;
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    const duration = 2200 + Math.random()*1400;
+    const drift = (Math.random()-0.5)*160;
+    el.animate([
+      { transform: `translate(0,0) rotate(0deg)`, opacity:1 },
+      { transform: `translate(${drift}px, 100vh) rotate(720deg)`, opacity:0.9 }
+    ], { duration, easing:'ease-in' });
+    setTimeout(()=>el.remove(), duration+100);
+  }
+}
+
+buildBank();
+buildVerses();
+updateProgress();
+</script>
+</body>
+</html>
